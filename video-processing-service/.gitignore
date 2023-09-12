@@ -1,1 +1,4 @@
 node_modules
+test-vid.mp4
+test-vid-processed.mp4
+.dockerignore
