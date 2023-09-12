@@ -10,4 +10,3 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
     console.log(`Video processing service listening at http://localhost:${port}`);
 });
-
