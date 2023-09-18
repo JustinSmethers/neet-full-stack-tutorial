@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Production stage
-FROM node:18
+FROM node:20.6.1
 
 # Install ffmpeg in the container
 RUN apt-get update && apt-get install -y ffmpeg
