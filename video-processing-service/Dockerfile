@@ -1,29 +1,41 @@
-# Use an official Node runtime as base image
-FROM node:20.6.1
+# Stage 1: Build stage
+FROM node:20.6.1 AS builder
 
-# Set working directory
-WORKDIR /usr/src/app
+# Set the working directory in the container to /app
+WORKDIR /app
 
-# Install global packages (if needed)
-RUN npm install -g ts-node
-
-# Copy package.json and package-lock.json for optimal caching
+# Copy package.json and package-lock.json into the working directory
 COPY package*.json ./
 
-# Install dependencies
+# Install any needed packages specified in package.json
 RUN npm install
 
-# Bundle app source
+# Bundle app source inside the docker image
 COPY . .
 
-# Compile TypeScript code (optional)
-# RUN npm run build
+# Build the app
+RUN npm run build
 
-# Set environment variables if needed
-# ENV SOME_ENV_VAR some_value
+# Stage 2: Production stage
+FROM node:18
 
-# Expose port
+# Install ffmpeg in the container
+RUN apt-get update && apt-get install -y ffmpeg
+
+# Set the working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm install --only=production
+
+# Copy built app from the builder stage
+COPY --from=builder /app/dist ./dist
+
+# Make port 3000 available to the world outside this container
 EXPOSE 3000
 
-# Run application
-CMD ["npm", "run", "start"]
+# Define the command to run your app using CMD which defines your runtime
+CMD [ "npm", "run", "serve" ]
